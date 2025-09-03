@@ -75,6 +75,13 @@ export class PolyphonicSynthesizer {
             this.masterGain.connect(this.audioContext.destination);
             ('✅ Master gain node created and connected');
             
+            // Create analyser node for oscilloscope
+            this.analyser = this.audioContext.createAnalyser();
+            this.analyser.fftSize = 2048;
+            this.analyser.smoothingTimeConstant = 0.8;
+            this.masterGain.connect(this.analyser);
+            ('✅ Analyser node created for oscilloscope');
+            
             // Create effects chain
             this.createEffectsChain();
             ('✅ Effects chain created');
@@ -591,7 +598,7 @@ export class PolyphonicSynthesizer {
         
         (`🔧 applyReleaseEnvelope: Starting release for voice ${voice.id}, release time: ${releaseTime}s`);
         
-        // Apply release envelope to gain node with exponential curve for smoother fade
+        // Apply release envelope to gain node
         if (voice.gain && voice.gain.gain) {
             // Cancel any existing scheduled values
             voice.gain.gain.cancelScheduledValues(now);
@@ -599,9 +606,13 @@ export class PolyphonicSynthesizer {
             const currentGain = voice.gain.gain.value;
             voice.gain.gain.setValueAtTime(currentGain, now);
             
-            // Use exponential ramp for smoother fade-out (more natural than linear)
-            voice.gain.gain.exponentialRampToValueAtTime(0.001, now + releaseTime);
-            (`🔧 applyReleaseEnvelope: Gain envelope set to exponential fade to 0.001 over ${releaseTime}s`);
+            // Use linear ramp to zero for clean cutoff
+            voice.gain.gain.linearRampToValueAtTime(0, now + releaseTime);
+            
+            // Immediately set to zero after ramp completes to prevent any residual signal
+            voice.gain.gain.setValueAtTime(0, now + releaseTime + 0.001);
+            
+            (`🔧 applyReleaseEnvelope: Gain envelope set to linear fade to 0 over ${releaseTime}s`);
         }
         
         // Apply release envelope to filter if it exists
@@ -613,18 +624,104 @@ export class PolyphonicSynthesizer {
             voice.filter.frequency.cancelScheduledValues(now);
             // Set current value as starting point
             voice.filter.frequency.setValueAtTime(voice.filter.frequency.value, now);
-            // Use exponential ramp for smoother filter transition
-            voice.filter.frequency.exponentialRampToValueAtTime(baseFreq, now + filterRelease);
-            (`🔧 applyReleaseEnvelope: Filter envelope set to exponential fade to ${baseFreq}Hz over ${filterRelease}s`);
+            // Use linear ramp for filter transition
+            voice.filter.frequency.linearRampToValueAtTime(baseFreq, now + filterRelease);
+            (`🔧 applyReleaseEnvelope: Filter envelope set to linear fade to ${baseFreq}Hz over ${filterRelease}s`);
         }
         
         // Schedule the actual stopping of oscillators after release completes
-        // Use a longer buffer to ensure the exponential curve reaches near-zero
         setTimeout(() => {
-            this.stopVoiceSmoothly(voice);
+            this.stopVoiceImmediately(voice);
             this.activeVoices.delete(voice.note);
             (`🔇 Voice ${voice.id} fully stopped after release envelope`);
-        }, releaseTime * 1000 + 100); // Increased buffer for exponential curve
+        }, releaseTime * 1000 + 10); // Small buffer to ensure envelope completes
+    }
+    
+    stopVoiceImmediately(voice) {
+        const now = this.audioContext.currentTime;
+        
+        (`🔇 stopVoiceImmediately: Immediately stopping voice ${voice.id} for note ${voice.note}`);
+        
+        try {
+            // Stop oscillators immediately
+            voice.oscillators.forEach(oscObj => {
+                try {
+                    if (oscObj.osc) {
+                        oscObj.osc.stop(now);
+                        oscObj.osc.disconnect();
+                    }
+                    if (oscObj.filter) {
+                        oscObj.filter.disconnect();
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error with oscillator:`, error);
+                }
+            });
+            
+            // Stop noise components
+            if (voice.noise) {
+                try {
+                    if (voice.noise.osc1) {
+                        voice.noise.osc1.stop(now);
+                        voice.noise.osc1.disconnect();
+                    }
+                    if (voice.noise.osc2) {
+                        voice.noise.osc2.stop(now);
+                        voice.noise.osc2.disconnect();
+                    }
+                    if (voice.noise.osc3) {
+                        voice.noise.osc3.stop(now);
+                        voice.noise.osc3.disconnect();
+                    }
+                    if (voice.noise.mixer) voice.noise.mixer.disconnect();
+                    if (voice.noise.filter) voice.noise.filter.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error with noise:`, error);
+                }
+            }
+            
+            // Stop LFO components
+            if (voice.lfoComponents) {
+                try {
+                    if (voice.lfoComponents.osc) {
+                        voice.lfoComponents.osc.stop(now);
+                        voice.lfoComponents.osc.disconnect();
+                    }
+                    if (voice.lfoComponents.gain) voice.lfoComponents.gain.disconnect();
+                    if (voice.lfoComponents.smoothing) voice.lfoComponents.smoothing.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error with LFO:`, error);
+                }
+            } else if (voice.lfo) {
+                try {
+                    voice.lfo.stop(now);
+                    voice.lfo.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error with LFO:`, error);
+                }
+            }
+            
+            // Disconnect filter and gain
+            if (voice.filter) {
+                try {
+                    voice.filter.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error disconnecting filter:`, error);
+                }
+            }
+            
+            if (voice.gain) {
+                try {
+                    voice.gain.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceImmediately: Error disconnecting voice gain:`, error);
+                }
+            }
+            
+            (`✅ stopVoiceImmediately: Voice ${voice.id} immediately stopped and cleaned up`);
+        } catch (error) {
+            console.warn(`⚠️ stopVoiceImmediately: Error during cleanup:`, error);
+        }
     }
     
     stopVoiceSmoothly(voice) {
@@ -758,13 +855,6 @@ export class PolyphonicSynthesizer {
         const now = this.audioContext.currentTime;
         (`🔧 createVoice: Audio context time: ${now}`);
         
-        // Create oscillators
-        this.createOscillators(voice, now);
-        (`🔧 createVoice: Created ${voice.oscillators.length} oscillators`);
-        
-        // Create noise
-        this.createNoise(voice, now);
-        
         // Create voice gain and filter FIRST
         voice.gain = this.audioContext.createGain();
         voice.gain.gain.setValueAtTime(0, now);
@@ -777,15 +867,18 @@ export class PolyphonicSynthesizer {
         voice.filter.Q.setValueAtTime(this.params.resonance * 3, now); // Reduced from 10x to 3x to prevent harsh ringing
         (`🔧 createVoice: Created voice filter node with type: ${this.params.filterType}`);
         
+        // Create oscillators AFTER gain and filter are ready
+        this.createOscillators(voice, now);
+        (`🔧 createVoice: Created ${voice.oscillators.length} oscillators`);
+        
+        // Create noise
+        this.createNoise(voice, now);
+        
         // NOW create LFO (after filter exists)
         this.createLFO(voice, now);
         (`🔧 createVoice: LFO creation completed`);
         
-        // Connect voice to the main ladder filter (Mini Moog signal chain)
-        voice.oscillators.forEach(osc => {
-            osc.filter.connect(voice.filter); // Individual voice filter
-            (`🔧 createVoice: Connected oscillator to voice filter`);
-        });
+        // Oscillators are already connected to voice filter in createOscillators method
         
         if (voice.noise) {
             voice.noise.filter.connect(voice.filter); // Individual voice filter
@@ -840,8 +933,15 @@ export class PolyphonicSynthesizer {
         osc1Filter.Q.setValueAtTime(0.7, now);
         
         (`🔧 createOscillators: OSC1 - freq: ${osc1Freq}Hz, type: ${this.params.osc1.waveform}, level: ${this.params.osc1.level}`);
-        osc1.start(now);
+        
+        // Connect oscillator to its filter
         osc1.connect(osc1Filter);
+        
+        // Connect to voice filter immediately to prevent clicking
+        osc1Filter.connect(voice.filter);
+        
+        // Start oscillator after connections are made
+        osc1.start(now);
         
         // Store both oscillator and filter for proper cleanup
         voice.oscillators.push({ osc: osc1, filter: osc1Filter });
@@ -859,8 +959,15 @@ export class PolyphonicSynthesizer {
         osc2Filter.Q.setValueAtTime(0.7, now);
         
         (`🔧 createOscillators: OSC2 - freq: ${osc2Freq}Hz, type: ${this.params.osc2.waveform}, level: ${this.params.osc2.level}`);
-        osc2.start(now);
+        
+        // Connect oscillator to its filter
         osc2.connect(osc2Filter);
+        
+        // Connect to voice filter immediately to prevent clicking
+        osc2Filter.connect(voice.filter);
+        
+        // Start oscillator after connections are made
+        osc2.start(now);
         
         // Store both oscillator and filter for proper cleanup
         voice.oscillators.push({ osc: osc2, filter: osc2Filter });
@@ -878,8 +985,15 @@ export class PolyphonicSynthesizer {
         osc3Filter.Q.setValueAtTime(0.7, now);
         
         (`🔧 createOscillators: OSC3 - freq: ${osc3Freq}Hz, type: ${this.params.osc3.waveform}, level: ${this.params.osc3.level}`);
-        osc3.start(now);
+        
+        // Connect oscillator to its filter
         osc3.connect(osc3Filter);
+        
+        // Connect to voice filter immediately to prevent clicking
+        osc3Filter.connect(voice.filter);
+        
+        // Start oscillator after connections are made
+        osc3.start(now);
         
         // Store both oscillator and filter for proper cleanup
         voice.oscillators.push({ osc: osc3, filter: osc3Filter });
@@ -996,17 +1110,18 @@ export class PolyphonicSynthesizer {
         
         (`🔧 applyEnvelopes: Attack: ${attackTime}s, Decay: ${decayTime}s, Sustain: ${sustainLevel}, Release: ${releaseTime}s`);
         
-        // Set initial gain to a very small value to prevent clicks
-        voice.gain.gain.setValueAtTime(0.001, now);
-        (`🔧 applyEnvelopes: Set initial gain to 0.001 to prevent clicks`);
+        // Set initial gain to a very small value to prevent clicks but allow immediate sound
+        const initialGain = voice.velocity * 0.01; // 1% of velocity
+        voice.gain.gain.setValueAtTime(initialGain, now);
+        (`🔧 applyEnvelopes: Set initial gain to ${initialGain} to prevent clicks`);
         
-        // Attack - use exponential ramp for smoother attack
-        voice.gain.gain.exponentialRampToValueAtTime(voice.velocity, now + attackTime);
-        (`🔧 applyEnvelopes: Exponential attack ramp to ${voice.velocity} at ${now + attackTime}`);
+        // Attack - use linear ramp for clean attack, starting immediately
+        voice.gain.gain.linearRampToValueAtTime(voice.velocity, now + attackTime);
+        (`🔧 applyEnvelopes: Linear attack ramp to ${voice.velocity} at ${now + attackTime}`);
         
-        // Decay - use exponential ramp for smoother decay
-        voice.gain.gain.exponentialRampToValueAtTime(sustainLevel * voice.velocity, now + attackTime + decayTime);
-        (`🔧 applyEnvelopes: Exponential decay ramp to ${sustainLevel * voice.velocity} at ${now + attackTime + decayTime}`);
+        // Decay - use linear ramp for clean decay
+        voice.gain.gain.linearRampToValueAtTime(sustainLevel * voice.velocity, now + attackTime + decayTime);
+        (`🔧 applyEnvelopes: Linear decay ramp to ${sustainLevel * voice.velocity} at ${now + attackTime + decayTime}`);
         
         // Release (will be set when noteOff is called)
         voice.releaseTime = releaseTime;
@@ -1028,13 +1143,13 @@ export class PolyphonicSynthesizer {
             voice.filter.frequency.setValueAtTime(baseFreq, now);
             (`🔧 applyEnvelopes: Set initial voice filter frequency to ${baseFreq}Hz`);
             
-            // Filter attack - use exponential ramp for smoother transition
-            voice.filter.frequency.exponentialRampToValueAtTime(maxFreq, now + filterAttack);
-            (`🔧 applyEnvelopes: Exponential filter attack ramp to ${maxFreq}Hz at ${now + filterAttack}`);
+            // Filter attack - use linear ramp for clean transition
+            voice.filter.frequency.linearRampToValueAtTime(maxFreq, now + filterAttack);
+            (`🔧 applyEnvelopes: Linear filter attack ramp to ${maxFreq}Hz at ${now + filterAttack}`);
             
-            // Filter decay - use exponential ramp for smoother transition
-            voice.filter.frequency.exponentialRampToValueAtTime(baseFreq + (maxFreq - baseFreq) * filterSustain, now + attackTime + filterDecay);
-            (`🔧 applyEnvelopes: Exponential filter decay ramp to ${baseFreq + (maxFreq - baseFreq) * filterSustain}Hz at ${now + attackTime + filterDecay}`);
+            // Filter decay - use linear ramp for clean transition
+            voice.filter.frequency.linearRampToValueAtTime(baseFreq + (maxFreq - baseFreq) * filterSustain, now + attackTime + filterDecay);
+            (`🔧 applyEnvelopes: Linear filter decay ramp to ${baseFreq + (maxFreq - baseFreq) * filterSustain}Hz at ${now + attackTime + filterDecay}`);
             
             voice.filterReleaseTime = filterRelease;
             
@@ -1201,6 +1316,10 @@ export class PolyphonicSynthesizer {
     
     getAudioContext() {
         return this.audioContext;
+    }
+    
+    getAnalyser() {
+        return this.analyser;
     }
     
     // Simple test tone to verify audio chain

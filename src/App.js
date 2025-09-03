@@ -10,6 +10,7 @@ import Envelopes from './components/Envelopes';
 import LFO from './components/LFO';
 import Effects from './components/Effects';
 import DrumMachine from './components/DrumMachine';
+import { Oscilloscope } from './components/Oscilloscope';
 
 const AppContainer = styled.div`
   max-width: 1400px;
@@ -122,6 +123,15 @@ function App() {
           <Keyboard 
             onNoteOn={playNote}
             onNoteOff={stopNote}
+          />
+        </SynthSection>
+
+        {/* Oscilloscope Section */}
+        <SynthSection style={{ gridColumn: '1 / -1' }}>
+          <SectionTitle>OSCILLOSCOPE</SectionTitle>
+          <Oscilloscope 
+            audioContext={synth?.audioContext}
+            synth={synth}
           />
         </SynthSection>
 
