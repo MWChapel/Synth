@@ -157,7 +157,7 @@ const KeyLabel = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.6rem;
-  color: #FFD700;
+  color: #000000;
   font-family: 'Courier New', monospace;
   pointer-events: none;
 `;
@@ -168,7 +168,7 @@ const BlackKeyLabel = styled.div`
   left: 50%;
   transform: translateX(-50%);
   font-size: 0.5rem;
-  color: #FFD700;
+  color: #FFFFFF;
   font-family: 'Courier New', monospace;
   pointer-events: none;
 `;
