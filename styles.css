@@ -1,0 +1,869 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', 'Monaco', monospace;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: auto;
+    font-size: 10px;
+}
+
+/* Main container */
+.synth-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 8px;
+}
+
+/* Header - Polymoog Style */
+.synth-header {
+    text-align: center;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
+    border-radius: 8px;
+    border: 2px solid #654321;
+    box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.3),
+        0 4px 15px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+.synth-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    border-radius: 6px;
+}
+
+.synth-header h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 
+        1px 1px 2px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(255, 215, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+/* Main content */
+.synth-main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+}
+
+/* Synth sections - Polymoog Style */
+.synth-section {
+    background: linear-gradient(135deg, #2F4F4F 0%, #3F5F5F 50%, #2F4F4F 100%);
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #556B6B;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.4),
+        0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.synth-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+.synth-section:hover {
+    background: linear-gradient(135deg, #3F5F5F 0%, #4F6F6F 50%, #3F5F5F 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.4),
+        0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.synth-section h2 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: #FFD700;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 2px solid #8B4513;
+    padding-bottom: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.5px;
+}
+
+.synth-section h3 {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    color: #FFD700;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #8B4513;
+    padding-bottom: 3px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.synth-section h4 {
+    font-size: 0.7rem;
+    margin-bottom: 5px;
+    color: #FFD700;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Volume section */
+.volume-section {
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+.volume-control {
+    display: flex;
+    justify-content: center;
+}
+
+/* Controls grid */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 6px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.control-group label {
+    font-size: 0.6rem;
+    margin-bottom: 3px;
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+/* Select controls - Polymoog Style */
+.control-select {
+    background: linear-gradient(135deg, #2F4F4F 0%, #3F5F5F 100%);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 4px 6px;
+    color: #FFD700;
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    box-shadow: 
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.control-select:hover {
+    background: linear-gradient(135deg, #3F5F5F 0%, #4F6F6F 100%);
+    border-color: #D2691E;
+    box-shadow: 
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.control-select:focus {
+    outline: none;
+    border-color: #FFD700;
+    box-shadow: 
+        inset 0 0 6px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.control-select option {
+    background: #2F4F4F;
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 0.6rem;
+}
+
+/* Realistic Circular Dial Styling */
+.dial-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dial {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: 
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 60%),
+        conic-gradient(from 0deg, #FFD700 0deg, #FFA500 180deg, #D2691E 360deg);
+    cursor: pointer;
+    position: relative;
+    border: 1px solid #8B4513;
+    box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.4),
+        0 0 15px rgba(255, 215, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dial::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 0.5px;
+    transform-origin: center bottom;
+    transform: translate(-50%, -50%) rotate(0deg);
+    box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+    z-index: 2;
+}
+
+.dial::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2px;
+    height: 2px;
+    background: #ffffff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.9);
+    z-index: 3;
+}
+
+.dial:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 215, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.dial:active {
+    transform: scale(0.98);
+    box-shadow: 
+        inset 0 0 20px rgba(0, 0, 0, 0.5),
+        0 0 10px rgba(255, 215, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Hide the default slider thumb */
+.dial::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.dial::-moz-range-thumb {
+    width: 0;
+    height: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+/* Dial value display */
+.dial-value {
+    margin-top: 4px;
+    font-size: 0.5rem;
+    color: #FFD700;
+    font-weight: bold;
+    background: rgba(139, 69, 19, 0.3);
+    padding: 2px 4px;
+    border-radius: 4px;
+    min-width: 30px;
+    text-align: center;
+    border: 1px solid rgba(139, 69, 19, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+/* Drum Machine Styles - Roland TR-808 Style */
+.drum-machine-section {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #8B0000 0%, #B22222 50%, #8B0000 100%) !important;
+    border: 2px solid #654321 !important;
+    box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.5),
+        0 4px 15px rgba(0, 0, 0, 0.6) !important;
+}
+
+.drum-machine-section h2 {
+    color: #FFD700 !important;
+    border-bottom-color: #FFD700 !important;
+    font-size: 1.1rem !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+.drum-controls {
+    margin-bottom: 10px;
+}
+
+.drum-machine-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.drum-button {
+    background: linear-gradient(45deg, #FF4500, #FF6347);
+    border: 1px solid #8B0000;
+    border-radius: 12px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.4);
+    font-family: 'Courier New', monospace;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.drum-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 3px 12px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #FF6347, #FF7F50);
+}
+
+.drum-button:active {
+    transform: translateY(0);
+    box-shadow: 
+        inset 0 0 15px rgba(0, 0, 0, 0.4),
+        0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.drum-sounds h3 {
+    color: #FFD700 !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 8px;
+    text-align: center;
+    border-bottom: 1px solid #FFD700;
+    padding-bottom: 4px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+.drum-sounds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.drum-sound {
+    background: linear-gradient(135deg, #B22222 0%, #CD5C5C 50%, #B22222 100%);
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #8B0000;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.drum-sound h4 {
+    color: #FFD700 !important;
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+.drum-controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+    gap: 4px;
+}
+
+/* Pattern Sequencer - TR-808 Style */
+.pattern-sequencer h3 {
+    color: #FFD700 !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 8px;
+    text-align: center;
+    border-bottom: 1px solid #FFD700;
+    padding-bottom: 4px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9) !important;
+}
+
+.sequencer-grid {
+    background: linear-gradient(135deg, #B22222 0%, #CD5C5C 50%, #B22222 100%);
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid #8B0000;
+    overflow-x: auto;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sequencer-header {
+    display: grid;
+    grid-template-columns: 30px repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 6px;
+    min-width: 300px;
+}
+
+.step-label {
+    text-align: center;
+    font-weight: bold;
+    color: #FFD700;
+    font-size: 0.6rem;
+    padding: 4px;
+    background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
+    border-radius: 3px;
+    border: 1px solid #654321;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+.sequencer-steps {
+    display: grid;
+    grid-template-columns: 30px repeat(4, 1fr);
+    gap: 4px;
+    min-width: 300px;
+}
+
+.step-row {
+    display: contents;
+}
+
+.step-number {
+    text-align: center;
+    font-weight: bold;
+    color: #FFD700;
+    padding: 4px;
+    background: linear-gradient(135deg, #8B0000 0%, #B22222 100%);
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    border: 1px solid #654321;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+.step-button {
+    width: 100%;
+    height: 24px;
+    border: 1px solid #8B0000;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #B22222 0%, #CD5C5C 100%);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    box-shadow: 
+        inset 0 0 6px rgba(0, 0, 0, 0.2),
+        0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.step-button:hover {
+    background: linear-gradient(135deg, #CD5C5C 0%, #DC143C 100%);
+    border-color: #FFD700;
+    box-shadow: 
+        inset 0 0 6px rgba(0, 0, 0, 0.2),
+        0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.step-button.active {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border-color: #FFD700;
+    box-shadow: 
+        inset 0 0 10px rgba(0, 0, 0, 0.3),
+        0 0 15px rgba(255, 215, 0, 0.5);
+    color: #000;
+    font-weight: bold;
+}
+
+.step-button.playing {
+    animation: stepPulse 0.5s ease;
+    background: linear-gradient(45deg, #00FF00, #32CD32);
+    border-color: #00FF00;
+}
+
+@keyframes stepPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Keyboard section - Polymoog Style */
+.keyboard-section {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: linear-gradient(135deg, #2F4F4F 0%, #3F5F5F 50%, #2F4F4F 100%) !important;
+    border: 2px solid #556B6B !important;
+}
+
+.keyboard-section h2 {
+    color: #FFD700 !important;
+    border-bottom-color: #8B4513 !important;
+}
+
+.keyboard-container {
+    overflow-x: auto;
+    padding: 8px 0;
+    margin: 8px 0;
+}
+
+.keyboard {
+    display: flex;
+    gap: 1px;
+    min-width: max-content;
+    padding: 0 8px;
+}
+
+.keyboard-octave {
+    display: flex;
+    position: relative;
+    height: 60px;
+    margin-right: 4px;
+}
+
+.keyboard-octave:last-child {
+    margin-right: 0;
+}
+
+.key {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    user-select: none;
+}
+
+.key.white {
+    width: 24px;
+    height: 60px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F5 100%);
+    border: 1px solid #D3D3D3;
+    border-radius: 0 0 3px 3px;
+    margin: 0 1px;
+    color: #333;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    font-size: 0.4rem;
+    font-weight: bold;
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+    font-family: 'Courier New', monospace;
+}
+
+.key.white:hover {
+    background: linear-gradient(180deg, #F0F0F0 0%, #E8E8E8 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+.key.white:active,
+.key.white.active {
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    transform: translateY(0);
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.3),
+        0 0 10px rgba(255, 215, 0, 0.5);
+    color: #000;
+}
+
+.key.black {
+    width: 14px;
+    height: 40px;
+    background: linear-gradient(180deg, #333 0%, #000 100%);
+    border: 1px solid #222;
+    border-radius: 0 0 2px 2px;
+    position: absolute;
+    color: #ffffff;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4px;
+    font-size: 0.3rem;
+    font-weight: bold;
+    box-shadow: 
+        0 1px 3px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    z-index: 1;
+    font-family: 'Courier New', monospace;
+}
+
+.key.black:hover {
+    background: linear-gradient(180deg, #444 0%, #222 100%);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 2px 6px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.key.black:active,
+.key.black.active {
+    background: linear-gradient(180deg, #FFD700 0%, #FFA500 100%);
+    transform: translateY(0);
+    box-shadow: 
+        inset 0 1px 3px rgba(0, 0, 0, 0.4),
+        0 0 10px rgba(255, 215, 0, 0.5);
+    color: #000;
+}
+
+/* Black key positioning for each octave */
+.keyboard-octave[data-octave="1"] .key.black[data-note="C#1"] { left: 17px; }
+.keyboard-octave[data-octave="1"] .key.black[data-note="D#1"] { left: 41px; }
+.keyboard-octave[data-octave="1"] .key.black[data-note="F#1"] { left: 89px; }
+.keyboard-octave[data-octave="1"] .key.black[data-note="G#1"] { left: 113px; }
+.keyboard-octave[data-octave="1"] .key.black[data-note="A#1"] { left: 137px; }
+
+.keyboard-octave[data-octave="2"] .key.black[data-note="C#2"] { left: 17px; }
+.keyboard-octave[data-octave="2"] .key.black[data-note="D#2"] { left: 41px; }
+.keyboard-octave[data-octave="2"] .key.black[data-note="F#2"] { left: 89px; }
+.keyboard-octave[data-octave="2"] .key.black[data-note="G#2"] { left: 113px; }
+.keyboard-octave[data-octave="2"] .key.black[data-note="A#2"] { left: 137px; }
+
+.keyboard-octave[data-octave="3"] .key.black[data-note="C#3"] { left: 17px; }
+.keyboard-octave[data-octave="3"] .key.black[data-note="D#3"] { left: 41px; }
+.keyboard-octave[data-octave="3"] .key.black[data-note="F#3"] { left: 89px; }
+.keyboard-octave[data-octave="3"] .key.black[data-note="G#3"] { left: 113px; }
+.keyboard-octave[data-octave="3"] .key.black[data-note="A#3"] { left: 137px; }
+
+.keyboard-octave[data-octave="4"] .key.black[data-note="C#4"] { left: 17px; }
+.keyboard-octave[data-octave="4"] .key.black[data-note="D#4"] { left: 41px; }
+.keyboard-octave[data-octave="4"] .key.black[data-note="F#4"] { left: 89px; }
+.keyboard-octave[data-octave="4"] .key.black[data-note="G#4"] { left: 113px; }
+.keyboard-octave[data-octave="4"] .key.black[data-note="A#4"] { left: 137px; }
+
+.keyboard-octave[data-octave="5"] .key.black[data-note="C#5"] { left: 17px; }
+.keyboard-octave[data-octave="5"] .key.black[data-note="D#5"] { left: 41px; }
+.keyboard-octave[data-octave="5"] .key.black[data-note="F#5"] { left: 89px; }
+.keyboard-octave[data-octave="5"] .key.black[data-note="G#5"] { left: 113px; }
+.keyboard-octave[data-octave="5"] .key.black[data-note="A#5"] { left: 137px; }
+
+.keyboard-octave[data-octave="6"] .key.black[data-note="C#6"] { left: 17px; }
+.keyboard-octave[data-octave="6"] .key.black[data-note="D#6"] { left: 41px; }
+.keyboard-octave[data-octave="6"] .key.black[data-note="F#6"] { left: 89px; }
+.keyboard-octave[data-octave="6"] .key.black[data-note="G#6"] { left: 113px; }
+.keyboard-octave[data-octave="6"] .key.black[data-note="A#6"] { left: 137px; }
+
+.keyboard-info {
+    margin-top: 6px;
+    color: #FFD700;
+    font-size: 0.6rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.5);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 215, 0, 0.7);
+}
+
+/* Animation for active keys */
+@keyframes keyPress {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+    100% { transform: scale(1); }
+}
+
+.key.active {
+    animation: keyPress 0.1s ease;
+}
+
+/* Debug Panel Styles */
+.debug-panel {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    border: 1px solid #FFD700;
+}
+
+.debug-panel h3 {
+    color: #FFD700;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.test-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.test-button {
+    background: linear-gradient(45deg, #FF4500, #FF6347);
+    border: 1px solid #8B0000;
+    border-radius: 6px;
+    padding: 6px 12px;
+    color: white;
+    font-size: 0.6rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        inset 0 0 8px rgba(0, 0, 0, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.4);
+    font-family: 'Courier New', monospace;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.test-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+        inset 0 0 8px rgba(0, 0, 0, 0.3),
+        0 3px 10px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #FF6347, #FF7F50);
+}
+
+.test-button:active {
+    transform: translateY(0);
+    box-shadow: 
+        inset 0 0 12px rgba(0, 0, 0, 0.4),
+        0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.debug-output {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #FFD700;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 0.6rem;
+    color: #FFD700;
+    font-family: 'Courier New', monospace;
+    max-height: 100px;
+    overflow-y: auto;
+    text-align: left;
+}
+
+.debug-output p {
+    margin: 2px 0;
+    line-height: 1.2;
+}
+
+.debug-output .success {
+    color: #00FF00;
+}
+
+.debug-output .warning {
+    color: #FFA500;
+}
+
+.debug-output .error {
+    color: #FF0000;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .synth-main {
+        grid-template-columns: 1fr;
+    }
+    
+    .controls-grid {
+        grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+        gap: 4px;
+    }
+    
+    .dial {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .key.white {
+        width: 20px;
+        height: 50px;
+        font-size: 0.35rem;
+    }
+    
+    .key.black {
+        width: 12px;
+        height: 35px;
+        font-size: 0.25rem;
+    }
+    
+    .keyboard-octave {
+        height: 50px;
+    }
+    
+    .drum-sounds-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .drum-controls-grid {
+        grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+        gap: 3px;
+    }
+    
+    .sequencer-grid {
+        padding: 6px;
+    }
+    
+    .sequencer-header,
+    .sequencer-steps {
+        min-width: 250px;
+    }
+    
+    .step-button {
+        height: 20px;
+    }
+} 

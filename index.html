@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Moog Synthesizer - TR-808 Drum Machine</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="synth-container">
+        <header class="synth-header">
+            <h1>MINI MOOG SYNTHESIZER</h1>
+            
+            <!-- Debug Panel -->
+            <div class="debug-panel">
+                <h3>🔧 SYSTEM TESTS</h3>
+                <div class="test-buttons">
+                    <button id="testToneBtn" class="test-button">🔊 Test Tone</button>
+                    <button id="forceResumeBtn" class="test-button">🔄 Force Resume</button>
+                    <button id="runTestsBtn" class="test-button">🧪 Run All Tests</button>
+                    <button id="checkStatusBtn" class="test-button">📊 Check Status</button>
+                </div>
+                <div id="debugOutput" class="debug-output">
+                    <p>Click test buttons to diagnose synth issues...</p>
+                </div>
+            </div>
+        </header>
+        
+        <main class="synth-main">
+            <!-- Keyboard Section - Moved to top -->
+            <section class="synth-section keyboard-section">
+                <h2>72-KEY KEYBOARD (6 OCTAVES)</h2>
+                <div class="keyboard-container">
+                    <div class="keyboard">
+                        <!-- Octave 1 (C1-B1) -->
+                        <div class="keyboard-octave" data-octave="1">
+                            <div class="key white" data-note="C1" data-frequency="32.70">C1</div>
+                            <div class="key black" data-note="C#1" data-frequency="34.65">C#1</div>
+                            <div class="key white" data-note="D1" data-frequency="36.71">D1</div>
+                            <div class="key black" data-note="D#1" data-frequency="38.89">D#1</div>
+                            <div class="key white" data-note="E1" data-frequency="41.20">E1</div>
+                            <div class="key white" data-note="F1" data-frequency="43.65">F1</div>
+                            <div class="key black" data-note="F#1" data-frequency="46.25">F#1</div>
+                            <div class="key white" data-note="G1" data-frequency="49.00">G1</div>
+                            <div class="key black" data-note="G#1" data-frequency="51.91">G#1</div>
+                            <div class="key white" data-note="A1" data-frequency="55.00">A1</div>
+                            <div class="key black" data-note="A#1" data-frequency="58.27">A#1</div>
+                            <div class="key white" data-note="B1" data-frequency="61.74">B1</div>
+                        </div>
+                        
+                        <!-- Octave 2 (C2-B2) -->
+                        <div class="keyboard-octave" data-octave="2">
+                            <div class="key white" data-note="C2" data-frequency="65.41">C2</div>
+                            <div class="key black" data-note="C#2" data-frequency="69.30">C#2</div>
+                            <div class="key white" data-note="D2" data-frequency="73.42">D2</div>
+                            <div class="key black" data-note="D#2" data-frequency="77.78">D#2</div>
+                            <div class="key white" data-note="E2" data-frequency="82.41">E2</div>
+                            <div class="key white" data-note="F2" data-frequency="87.31">F2</div>
+                            <div class="key black" data-note="F#2" data-frequency="92.50">F#2</div>
+                            <div class="key white" data-note="G2" data-frequency="98.00">G2</div>
+                            <div class="key black" data-note="G#2" data-frequency="103.83">G#2</div>
+                            <div class="key white" data-note="A2" data-frequency="110.00">A2</div>
+                            <div class="key black" data-note="A#2" data-frequency="116.54">A#2</div>
+                            <div class="key white" data-note="B2" data-frequency="123.47">B2</div>
+                        </div>
+                        
+                        <!-- Octave 3 (C3-B3) -->
+                        <div class="keyboard-octave" data-octave="3">
+                            <div class="key white" data-note="C3" data-frequency="130.81">C3</div>
+                            <div class="key black" data-note="C#3" data-frequency="138.59">C#3</div>
+                            <div class="key white" data-note="D3" data-frequency="146.83">D3</div>
+                            <div class="key black" data-note="D#3" data-frequency="155.56">D#3</div>
+                            <div class="key white" data-note="E3" data-frequency="164.81">E3</div>
+                            <div class="key white" data-note="F3" data-frequency="174.61">F3</div>
+                            <div class="key black" data-note="F#3" data-frequency="185.00">F#3</div>
+                            <div class="key white" data-note="G3" data-frequency="196.00">G3</div>
+                            <div class="key black" data-note="G#3" data-frequency="207.65">G#3</div>
+                            <div class="key white" data-note="A3" data-frequency="220.00">A3</div>
+                            <div class="key black" data-note="A#3" data-frequency="233.08">A#3</div>
+                            <div class="key white" data-note="B3" data-frequency="246.94">B3</div>
+                        </div>
+                        
+                        <!-- Octave 4 (C4-B4) -->
+                        <div class="keyboard-octave" data-octave="4">
+                            <div class="key white" data-note="C4" data-frequency="261.63">C4</div>
+                            <div class="key black" data-note="C#4" data-frequency="277.18">C#4</div>
+                            <div class="key white" data-note="D4" data-frequency="293.66">D4</div>
+                            <div class="key black" data-note="D#4" data-frequency="311.13">D#4</div>
+                            <div class="key white" data-note="E4" data-frequency="329.63">E4</div>
+                            <div class="key white" data-note="F4" data-frequency="349.23">F4</div>
+                            <div class="key black" data-note="F#4" data-frequency="369.99">F#4</div>
+                            <div class="key white" data-note="G4" data-frequency="392.00">G4</div>
+                            <div class="key black" data-note="G#4" data-frequency="415.30">G#4</div>
+                            <div class="key white" data-note="A4" data-frequency="440.00">A4</div>
+                            <div class="key black" data-note="A#4" data-frequency="466.16">A#4</div>
+                            <div class="key white" data-note="B4" data-frequency="493.88">B4</div>
+                        </div>
+                        
+                        <!-- Octave 5 (C5-B5) -->
+                        <div class="keyboard-octave" data-octave="5">
+                            <div class="key white" data-note="C5" data-frequency="523.25">C5</div>
+                            <div class="key black" data-note="C#5" data-frequency="554.37">C#5</div>
+                            <div class="key white" data-note="D5" data-frequency="587.33">D5</div>
+                            <div class="key black" data-note="D#5" data-frequency="622.25">D#5</div>
+                            <div class="key white" data-note="E5" data-frequency="659.25">E5</div>
+                            <div class="key white" data-note="F5" data-frequency="698.46">F5</div>
+                            <div class="key black" data-note="F#5" data-frequency="739.99">F#5</div>
+                            <div class="key white" data-note="G5" data-frequency="783.99">G5</div>
+                            <div class="key black" data-note="G#5" data-frequency="830.61">G#5</div>
+                            <div class="key white" data-note="A5" data-frequency="880.00">A5</div>
+                            <div class="key black" data-note="A#5" data-frequency="932.33">A#5</div>
+                            <div class="key white" data-note="B5" data-frequency="987.77">B5</div>
+                        </div>
+                        
+                        <!-- Octave 6 (C6-B6) -->
+                        <div class="keyboard-octave" data-octave="6">
+                            <div class="key white" data-note="C6" data-frequency="1046.50">C6</div>
+                            <div class="key black" data-note="C#6" data-frequency="1108.73">C#6</div>
+                            <div class="key white" data-note="D6" data-frequency="1174.66">D6</div>
+                            <div class="key black" data-note="D#6" data-frequency="1244.51">D#6</div>
+                            <div class="key white" data-note="E6" data-frequency="1318.51">E6</div>
+                            <div class="key white" data-note="F6" data-frequency="1396.91">F6</div>
+                            <div class="key black" data-note="F#6" data-frequency="1479.98">F#6</div>
+                            <div class="key white" data-note="G6" data-frequency="1567.98">G6</div>
+                            <div class="key black" data-note="G#6" data-frequency="1661.22">G#6</div>
+                            <div class="key white" data-note="A6" data-frequency="1760.00">A6</div>
+                            <div class="key black" data-note="A#6" data-frequency="1864.66">A#6</div>
+                            <div class="key white" data-note="B6" data-frequency="1975.53">B6</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="keyboard-info">
+                    Use QWERTY keyboard or click/touch keys to play. Supports polyphony and velocity.
+                </div>
+            </section>
+
+            <!-- Master Volume Section -->
+            <section class="synth-section volume-section">
+                <h2>Master Volume</h2>
+                <div class="volume-control">
+                    <div class="control-group">
+                        <label for="masterVolume">Volume</label>
+                        <div class="dial-container">
+                            <input type="range" id="masterVolume" class="dial" min="0" max="1" step="0.01" value="0.5">
+                            <div class="dial-value">0.5</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Oscillators Section - Mini Moog Style -->
+            <section class="synth-section">
+                <h2>OSCILLATORS</h2>
+                <div class="controls-grid">
+                    <!-- Oscillator 1 -->
+                    <div class="control-group">
+                        <label for="osc1Waveform">OSC 1 Wave</label>
+                        <select id="osc1Waveform" class="control-select">
+                            <option value="sine">SINE</option>
+                            <option value="square">SQUARE</option>
+                            <option value="sawtooth">SAW</option>
+                            <option value="triangle">TRI</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc1Octave">OSC 1 Octave</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc1Octave" class="dial" min="-2" max="2" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc1Tune">OSC 1 Tune</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc1Tune" class="dial" min="-7" max="7" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc1Level">OSC 1 Level</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc1Level" class="dial" min="0" max="1" step="0.01" value="0.8">
+                            <div class="dial-value">0.8</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-grid">
+                    <!-- Oscillator 2 -->
+                    <div class="control-group">
+                        <label for="osc2Waveform">OSC 2 Wave</label>
+                        <select id="osc2Waveform" class="control-select">
+                            <option value="sine">SINE</option>
+                            <option value="square">SQUARE</option>
+                            <option value="sawtooth">SAW</option>
+                            <option value="triangle">TRI</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc2Octave">OSC 2 Octave</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc2Octave" class="dial" min="-2" max="2" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc2Tune">OSC 2 Tune</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc2Tune" class="dial" min="-7" max="7" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc2Level">OSC 2 Level</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc2Level" class="dial" min="0" max="1" step="0.01" value="0.6">
+                            <div class="dial-value">0.6</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls-grid">
+                    <!-- Oscillator 3 -->
+                    <div class="control-group">
+                        <label for="osc3Waveform">OSC 3 Wave</label>
+                        <select id="osc3Waveform" class="control-select">
+                            <option value="sine">SINE</option>
+                            <option value="square">SQUARE</option>
+                            <option value="sawtooth">SAW</option>
+                            <option value="triangle">TRI</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc3Octave">OSC 3 Octave</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc3Octave" class="dial" min="-2" max="2" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc3Tune">OSC 3 Tune</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc3Tune" class="dial" min="-7" max="7" step="1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="osc3Level">OSC 3 Level</label>
+                        <div class="dial-container">
+                            <input type="range" id="osc3Level" class="dial" min="0" max="1" step="0.01" value="0.4">
+                            <div class="dial-value">0.4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini Moog Modulation Section -->
+                <h3>MODULATION</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="oscSync">OSC Sync</label>
+                        <div class="dial-container">
+                            <input type="range" id="oscSync" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="ringMod">Ring Mod</label>
+                        <div class="dial-container">
+                            <input type="range" id="ringMod" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="noiseLevel">Noise Level</label>
+                        <div class="dial-container">
+                            <input type="range" id="noiseLevel" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filter Section - Mini Moog Ladder Filter -->
+            <section class="synth-section">
+                <h2>MOOG LADDER FILTER</h2>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="filterCutoff">Cutoff</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterCutoff" class="dial" min="20" max="20000" step="1" value="2000">
+                            <div class="dial-value">2000</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterResonance">Resonance</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterResonance" class="dial" min="0" max="20" step="0.1" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterType">Filter Type</label>
+                        <select id="filterType" class="control-select">
+                            <option value="lowpass">LOWPASS</option>
+                            <option value="highpass">HIGHPASS</option>
+                            <option value="bandpass">BANDPASS</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterSlope">Slope</label>
+                        <select id="filterSlope" class="control-select">
+                            <option value="12">12dB</option>
+                            <option value="24" selected>24dB</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Filter Modulation -->
+                <h3>FILTER MODULATION</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="filterEnvAmount">Env Amount</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterEnvAmount" class="dial" min="0" max="1" step="0.01" value="0.5">
+                            <div class="dial-value">0.5</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterLfoAmount">LFO Amount</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterLfoAmount" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterKeyboard">Keyboard</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterKeyboard" class="dial" min="0" max="1" step="0.01" value="0.3">
+                            <div class="dial-value">0.3</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Envelope Section - Mini Moog ADSR -->
+            <section class="synth-section">
+                <h2>ENVELOPES</h2>
+                <h3>AMPLITUDE ENVELOPE</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="attack">Attack</label>
+                        <div class="dial-container">
+                            <input type="range" id="attack" class="dial" min="0.001" max="5" step="0.001" value="0.1">
+                            <div class="dial-value">0.1</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="decay">Decay</label>
+                        <div class="dial-container">
+                            <input type="range" id="decay" class="dial" min="0.001" max="5" step="0.001" value="0.1">
+                            <div class="dial-value">0.1</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="sustain">Sustain</label>
+                        <div class="dial-container">
+                            <input type="range" id="sustain" class="dial" min="0" max="1" step="0.01" value="0.7">
+                            <div class="dial-value">0.7</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="release">Release</label>
+                        <div class="dial-container">
+                            <input type="range" id="release" class="dial" min="0.001" max="5" step="0.001" value="0.3">
+                            <div class="dial-value">0.3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>FILTER ENVELOPE</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="filterAttack">F Attack</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterAttack" class="dial" min="0.001" max="5" step="0.001" value="0.1">
+                            <div class="dial-value">0.1</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterDecay">F Decay</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterDecay" class="dial" min="0.001" max="5" step="0.001" value="0.1">
+                            <div class="dial-container">
+                                <input type="range" id="filterDecay" class="dial" min="0.001" max="5" step="0.001" value="0.1">
+                                <div class="dial-value">0.1</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterSustain">F Sustain</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterSustain" class="dial" min="0" max="1" step="0.01" value="0.5">
+                            <div class="dial-value">0.5</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="filterRelease">F Release</label>
+                        <div class="dial-container">
+                            <input type="range" id="filterRelease" class="dial" min="0.001" max="5" step="0.001" value="0.3">
+                            <div class="dial-value">0.3</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LFO Section - Mini Moog Modulation -->
+            <section class="synth-section">
+                <h2>LFO & MODULATION</h2>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="lfoWaveform">LFO Wave</label>
+                        <select id="lfoWaveform" class="control-select">
+                            <option value="sine">SINE</option>
+                            <option value="square">SQUARE</option>
+                            <option value="sawtooth">SAW</option>
+                            <option value="triangle">TRI</option>
+                            <option value="random">RANDOM</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="lfoRate">LFO Rate</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoRate" class="dial" min="0.1" max="20" step="0.1" value="1">
+                            <div class="dial-value">1</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="lfoAmount">LFO Amount</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoAmount" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="lfoDelay">LFO Delay</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoDelay" class="dial" min="0" max="2" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modulation Routing -->
+                <h3>MODULATION ROUTING</h3>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="lfoToPitch">LFO → Pitch</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoToPitch" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="lfoToFilter">LFO → Filter</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoToFilter" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="lfoToAmp">LFO → Amp</label>
+                        <div class="dial-container">
+                            <input type="range" id="lfoToAmp" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Effects Section -->
+            <section class="synth-section">
+                <h2>EFFECTS</h2>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="reverb">Reverb</label>
+                        <div class="dial-container">
+                            <input type="range" id="reverb" class="dial" min="0" max="1" step="0.01" value="0.3">
+                            <div class="dial-value">0.3</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="delay">Delay</label>
+                        <div class="dial-container">
+                            <input type="range" id="delay" class="dial" min="0" max="1" step="0.01" value="0.2">
+                            <div class="dial-value">0.2</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="distortion">Distortion</label>
+                        <div class="dial-container">
+                            <input type="range" id="distortion" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="chorus">Chorus</label>
+                        <div class="dial-container">
+                            <input type="range" id="chorus" class="dial" min="0" max="1" step="0.01" value="0">
+                            <div class="dial-value">0</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Drum Machine Section -->
+            <section class="synth-section drum-machine-section">
+                <h2>ROLAND TR-808 DRUM MACHINE</h2>
+                
+                <div class="drum-controls">
+                    <div class="drum-machine-controls">
+                        <div class="control-group">
+                            <label for="drumTempo">Tempo</label>
+                            <div class="dial-container">
+                                <input type="range" id="drumTempo" class="dial" min="60" max="180" step="1" value="120">
+                                <div class="dial-value">120</div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="drumVolume">Volume</label>
+                            <div class="dial-container">
+                                <input type="range" id="drumVolume" class="dial" min="0" max="1" step="0.01" value="0.6">
+                                <div class="dial-value">0.6</div>
+                            </div>
+                        </div>
+                        <button id="playStopBtn" class="drum-button">▶️ Play</button>
+                        <button id="clearPatternBtn" class="drum-button">🗑️ Clear</button>
+                    </div>
+                </div>
+
+                <div class="drum-sounds">
+                    <h3>DRUM SOUNDS</h3>
+                    <div class="drum-sounds-grid">
+                        <div class="drum-sound">
+                            <h4>KICK</h4>
+                            <div class="drum-controls-grid">
+                                <div class="control-group">
+                                    <label for="kickVolume">Volume</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="kickVolume" class="dial" min="0" max="1" step="0.01" value="0.8">
+                                        <div class="dial-value">0.8</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="kickPitch">Pitch</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="kickPitch" class="dial" min="20" max="200" step="1" value="60">
+                                        <div class="dial-value">60</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="kickDecay">Decay</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="kickDecay" class="dial" min="0.1" max="2" step="0.01" value="0.3">
+                                        <div class="dial-value">0.3</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="drum-sound">
+                            <h4>SNARE</h4>
+                            <div class="drum-controls-grid">
+                                <div class="control-group">
+                                    <label for="snareVolume">Volume</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="snareVolume" class="dial" min="0" max="1" step="0.01" value="0.7">
+                                        <div class="dial-value">0.7</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="snarePitch">Pitch</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="snarePitch" class="dial" min="100" max="800" step="1" value="400">
+                                        <div class="dial-value">400</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="snareDecay">Decay</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="snareDecay" class="dial" min="0.1" max="2" step="0.01" value="0.2">
+                                        <div class="dial-value">0.2</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="drum-sound">
+                            <h4>HI-HAT</h4>
+                            <div class="drum-controls-grid">
+                                <div class="control-group">
+                                    <label for="hihatVolume">Volume</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="hihatVolume" class="dial" min="0" max="1" step="0.01" value="0.6">
+                                        <div class="dial-value">0.6</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="hihatPitch">Pitch</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="hihatPitch" class="dial" min="500" max="2000" step="1" value="1200">
+                                        <div class="dial-value">1200</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="hihatDecay">Decay</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="hihatDecay" class="dial" min="0.05" max="1" step="0.01" value="0.1">
+                                        <div class="dial-value">0.1</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="drum-sound">
+                            <h4>CLAP</h4>
+                            <div class="drum-controls-grid">
+                                <div class="control-group">
+                                    <label for="clapVolume">Volume</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="clapVolume" class="dial" min="0" max="1" step="0.01" value="0.6">
+                                        <div class="dial-value">0.6</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="clapPitch">Pitch</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="clapPitch" class="dial" min="200" max="1000" step="1" value="600">
+                                        <div class="dial-value">600</div>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label for="clapDecay">Decay</label>
+                                    <div class="dial-container">
+                                        <input type="range" id="clapDecay" class="dial" min="0.1" max="2" step="0.01" value="0.15">
+                                        <div class="dial-value">0.15</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pattern-sequencer">
+                    <h3>PATTERN SEQUENCER</h3>
+                    <div class="sequencer-grid">
+                        <div class="sequencer-header">
+                            <div class="step-label">STEP</div>
+                            <div class="step-label">KICK</div>
+                            <div class="step-label">SNARE</div>
+                            <div class="step-label">HI-HAT</div>
+                            <div class="step-label">CLAP</div>
+                        </div>
+                        <div class="sequencer-steps">
+                            <!-- Dynamically generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="synth.js"></script>
+</body>
+</html> 
