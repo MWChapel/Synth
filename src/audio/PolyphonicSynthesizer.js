@@ -154,9 +154,24 @@ export class PolyphonicSynthesizer {
         this.chorusDelay = this.audioContext.createDelay(0.05); // 50ms max delay
         this.chorusDelay.delayTime.setValueAtTime(0.02, this.audioContext.currentTime); // 20ms base delay
         
+        // Create chorus LFO with proper scaling and smoothing
         this.chorusLFO = this.audioContext.createOscillator();
         this.chorusLFO.frequency.setValueAtTime(1.5, this.audioContext.currentTime); // 1.5Hz modulation
-        this.chorusLFO.connect(this.chorusDelay.delayTime);
+        
+        // Add gain node to scale LFO modulation depth
+        this.chorusLFOGain = this.audioContext.createGain();
+        this.chorusLFOGain.gain.setValueAtTime(0.005, this.audioContext.currentTime); // 5ms modulation depth
+        
+        // Add smoothing filter to prevent clicking
+        this.chorusLFOSmoothing = this.audioContext.createBiquadFilter();
+        this.chorusLFOSmoothing.type = 'lowpass';
+        this.chorusLFOSmoothing.frequency.setValueAtTime(3, this.audioContext.currentTime); // 3Hz smoothing
+        this.chorusLFOSmoothing.Q.setValueAtTime(0.7, this.audioContext.currentTime);
+        
+        // Connect LFO through scaling and smoothing
+        this.chorusLFO.connect(this.chorusLFOGain);
+        this.chorusLFOGain.connect(this.chorusLFOSmoothing);
+        this.chorusLFOSmoothing.connect(this.chorusDelay.delayTime);
         this.chorusLFO.start();
         
         // Create dry signal path (bypasses effects when they're disabled)
@@ -423,10 +438,18 @@ export class PolyphonicSynthesizer {
                                 this.chorusGain.gain.setValueAtTime(value, this.audioContext.currentTime);
                             }
                         } else if (prop === 'rate') {
-                            // Update chorus rate if implemented
+                            // Update chorus LFO rate
+                            if (this.chorusLFO) {
+                                this.chorusLFO.frequency.setValueAtTime(value, this.audioContext.currentTime);
+                            }
                             ('🔧 Chorus rate updated to:', value);
                         } else if (prop === 'depth') {
-                            // Update chorus depth if implemented
+                            // Update chorus modulation depth
+                            if (this.chorusLFOGain) {
+                                // Scale depth to appropriate modulation range (0-10ms)
+                                const modulationDepth = value * 0.01; // Convert to 0-10ms range
+                                this.chorusLFOGain.gain.setValueAtTime(modulationDepth, this.audioContext.currentTime);
+                            }
                             ('🔧 Chorus depth updated to:', value);
                         }
                     }
