@@ -576,11 +576,168 @@ export class PolyphonicSynthesizer {
                 voice.timeoutId = null;
             }
             
-            this.stopVoice(voice);
-            this.activeVoices.delete(note);
-            (`🔇 Note ${note} stopped`);
+            // Apply release envelope to prevent clicking
+            this.applyReleaseEnvelope(voice);
+            
+            (`🔇 Note ${note} release started`);
         } else {
             (`🔇 Note ${note} was not playing`);
+        }
+    }
+    
+    applyReleaseEnvelope(voice) {
+        const now = this.audioContext.currentTime;
+        const releaseTime = this.params.release;
+        
+        (`🔧 applyReleaseEnvelope: Starting release for voice ${voice.id}, release time: ${releaseTime}s`);
+        
+        // Apply release envelope to gain node with exponential curve for smoother fade
+        if (voice.gain && voice.gain.gain) {
+            // Cancel any existing scheduled values
+            voice.gain.gain.cancelScheduledValues(now);
+            // Set current value as starting point
+            const currentGain = voice.gain.gain.value;
+            voice.gain.gain.setValueAtTime(currentGain, now);
+            
+            // Use exponential ramp for smoother fade-out (more natural than linear)
+            voice.gain.gain.exponentialRampToValueAtTime(0.001, now + releaseTime);
+            (`🔧 applyReleaseEnvelope: Gain envelope set to exponential fade to 0.001 over ${releaseTime}s`);
+        }
+        
+        // Apply release envelope to filter if it exists
+        if (voice.filter && voice.filter.frequency && this.params.envelopeAmount > 0) {
+            const filterRelease = this.params.filterRelease;
+            const baseFreq = this.params.cutoff * 2000;
+            
+            // Cancel any existing scheduled values
+            voice.filter.frequency.cancelScheduledValues(now);
+            // Set current value as starting point
+            voice.filter.frequency.setValueAtTime(voice.filter.frequency.value, now);
+            // Use exponential ramp for smoother filter transition
+            voice.filter.frequency.exponentialRampToValueAtTime(baseFreq, now + filterRelease);
+            (`🔧 applyReleaseEnvelope: Filter envelope set to exponential fade to ${baseFreq}Hz over ${filterRelease}s`);
+        }
+        
+        // Schedule the actual stopping of oscillators after release completes
+        // Use a longer buffer to ensure the exponential curve reaches near-zero
+        setTimeout(() => {
+            this.stopVoiceSmoothly(voice);
+            this.activeVoices.delete(voice.note);
+            (`🔇 Voice ${voice.id} fully stopped after release envelope`);
+        }, releaseTime * 1000 + 100); // Increased buffer for exponential curve
+    }
+    
+    stopVoiceSmoothly(voice) {
+        const now = this.audioContext.currentTime;
+        
+        (`🔇 stopVoiceSmoothly: Smoothly stopping voice ${voice.id} for note ${voice.note}`);
+        
+        // Apply a very short fade-out to oscillators before stopping them
+        const fadeTime = 0.01; // 10ms fade-out
+        
+        try {
+            // Disconnect oscillators with a very short fade
+            voice.oscillators.forEach(oscObj => {
+                try {
+                    if (oscObj.osc) {
+                        // Create a temporary gain node for smooth stopping
+                        const tempGain = this.audioContext.createGain();
+                        tempGain.gain.setValueAtTime(1, now);
+                        tempGain.gain.exponentialRampToValueAtTime(0.001, now + fadeTime);
+                        
+                        // Disconnect from current chain and connect through temp gain
+                        oscObj.osc.disconnect();
+                        oscObj.osc.connect(tempGain);
+                        tempGain.connect(oscObj.filter);
+                        
+                        // Stop oscillator after fade
+                        setTimeout(() => {
+                            try {
+                                oscObj.osc.stop();
+                                oscObj.osc.disconnect();
+                                tempGain.disconnect();
+                            } catch (e) {
+                                // Oscillator might already be stopped
+                            }
+                        }, fadeTime * 1000);
+                    }
+                    
+                    // Disconnect the filter
+                    if (oscObj.filter) {
+                        setTimeout(() => {
+                            try {
+                                oscObj.filter.disconnect();
+                            } catch (e) {
+                                // Filter might already be disconnected
+                            }
+                        }, fadeTime * 1000);
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceSmoothly: Error with oscillator:`, error);
+                }
+            });
+            
+            // Handle noise components
+            if (voice.noise) {
+                try {
+                    if (voice.noise.osc1) {
+                        voice.noise.osc1.stop(now + fadeTime);
+                        setTimeout(() => voice.noise.osc1.disconnect(), fadeTime * 1000);
+                    }
+                    if (voice.noise.osc2) {
+                        voice.noise.osc2.stop(now + fadeTime);
+                        setTimeout(() => voice.noise.osc2.disconnect(), fadeTime * 1000);
+                    }
+                    if (voice.noise.osc3) {
+                        voice.noise.osc3.stop(now + fadeTime);
+                        setTimeout(() => voice.noise.osc3.disconnect(), fadeTime * 1000);
+                    }
+                    
+                    setTimeout(() => {
+                        if (voice.noise.mixer) voice.noise.mixer.disconnect();
+                        if (voice.noise.filter) voice.noise.filter.disconnect();
+                    }, fadeTime * 1000);
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceSmoothly: Error with noise:`, error);
+                }
+            }
+            
+            // Handle LFO components
+            if (voice.lfoComponents) {
+                try {
+                    if (voice.lfoComponents.osc) {
+                        voice.lfoComponents.osc.stop(now + fadeTime);
+                        setTimeout(() => voice.lfoComponents.osc.disconnect(), fadeTime * 1000);
+                    }
+                    setTimeout(() => {
+                        if (voice.lfoComponents.gain) voice.lfoComponents.gain.disconnect();
+                        if (voice.lfoComponents.smoothing) voice.lfoComponents.smoothing.disconnect();
+                    }, fadeTime * 1000);
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceSmoothly: Error with LFO:`, error);
+                }
+            } else if (voice.lfo) {
+                try {
+                    voice.lfo.stop(now + fadeTime);
+                    setTimeout(() => voice.lfo.disconnect(), fadeTime * 1000);
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceSmoothly: Error with LFO:`, error);
+                }
+            }
+            
+            // Disconnect filter and gain after fade
+            setTimeout(() => {
+                try {
+                    if (voice.filter) voice.filter.disconnect();
+                    if (voice.gain) voice.gain.disconnect();
+                } catch (error) {
+                    console.warn(`⚠️ stopVoiceSmoothly: Error disconnecting filter/gain:`, error);
+                }
+            }, fadeTime * 1000);
+            
+            (`✅ stopVoiceSmoothly: Voice ${voice.id} smoothly stopped`);
+        } catch (error) {
+            console.warn(`⚠️ stopVoiceSmoothly: Error during smooth cleanup:`, error);
         }
     }
     
@@ -839,17 +996,17 @@ export class PolyphonicSynthesizer {
         
         (`🔧 applyEnvelopes: Attack: ${attackTime}s, Decay: ${decayTime}s, Sustain: ${sustainLevel}, Release: ${releaseTime}s`);
         
-        // Set initial gain to a small value instead of 0 for immediate audibility
-        voice.gain.gain.setValueAtTime(voice.velocity * 0.1, now);
-        (`🔧 applyEnvelopes: Set initial gain to ${voice.velocity * 0.1} for immediate audibility`);
+        // Set initial gain to a very small value to prevent clicks
+        voice.gain.gain.setValueAtTime(0.001, now);
+        (`🔧 applyEnvelopes: Set initial gain to 0.001 to prevent clicks`);
         
-        // Attack - ramp to full velocity quickly
-        voice.gain.gain.linearRampToValueAtTime(voice.velocity, now + attackTime);
-        (`🔧 applyEnvelopes: Attack ramp to ${voice.velocity} at ${now + attackTime}`);
+        // Attack - use exponential ramp for smoother attack
+        voice.gain.gain.exponentialRampToValueAtTime(voice.velocity, now + attackTime);
+        (`🔧 applyEnvelopes: Exponential attack ramp to ${voice.velocity} at ${now + attackTime}`);
         
-        // Decay
-        voice.gain.gain.linearRampToValueAtTime(sustainLevel * voice.velocity, now + attackTime + decayTime);
-        (`🔧 applyEnvelopes: Decay ramp to ${sustainLevel * voice.velocity} at ${now + attackTime + decayTime}`);
+        // Decay - use exponential ramp for smoother decay
+        voice.gain.gain.exponentialRampToValueAtTime(sustainLevel * voice.velocity, now + attackTime + decayTime);
+        (`🔧 applyEnvelopes: Exponential decay ramp to ${sustainLevel * voice.velocity} at ${now + attackTime + decayTime}`);
         
         // Release (will be set when noteOff is called)
         voice.releaseTime = releaseTime;
@@ -871,13 +1028,13 @@ export class PolyphonicSynthesizer {
             voice.filter.frequency.setValueAtTime(baseFreq, now);
             (`🔧 applyEnvelopes: Set initial voice filter frequency to ${baseFreq}Hz`);
             
-            // Filter attack
-            voice.filter.frequency.linearRampToValueAtTime(maxFreq, now + filterAttack);
-            (`🔧 applyEnvelopes: Filter attack ramp to ${maxFreq}Hz at ${now + filterAttack}`);
+            // Filter attack - use exponential ramp for smoother transition
+            voice.filter.frequency.exponentialRampToValueAtTime(maxFreq, now + filterAttack);
+            (`🔧 applyEnvelopes: Exponential filter attack ramp to ${maxFreq}Hz at ${now + filterAttack}`);
             
-            // Filter decay
-            voice.filter.frequency.linearRampToValueAtTime(baseFreq + (maxFreq - baseFreq) * filterSustain, now + attackTime + filterDecay);
-            (`🔧 applyEnvelopes: Filter decay ramp to ${baseFreq + (maxFreq - baseFreq) * filterSustain}Hz at ${now + attackTime + filterDecay}`);
+            // Filter decay - use exponential ramp for smoother transition
+            voice.filter.frequency.exponentialRampToValueAtTime(baseFreq + (maxFreq - baseFreq) * filterSustain, now + attackTime + filterDecay);
+            (`🔧 applyEnvelopes: Exponential filter decay ramp to ${baseFreq + (maxFreq - baseFreq) * filterSustain}Hz at ${now + attackTime + filterDecay}`);
             
             voice.filterReleaseTime = filterRelease;
             
