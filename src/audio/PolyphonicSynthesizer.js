@@ -632,9 +632,6 @@ export class PolyphonicSynthesizer {
             // Use linear ramp to zero for clean cutoff
             voice.gain.gain.linearRampToValueAtTime(0, now + releaseTime);
             
-            // Immediately set to zero after ramp completes to prevent any residual signal
-            voice.gain.gain.setValueAtTime(0, now + releaseTime + 0.001);
-            
             (`🔧 applyReleaseEnvelope: Gain envelope set to linear fade to 0 over ${releaseTime}s`);
         }
         
@@ -657,7 +654,7 @@ export class PolyphonicSynthesizer {
             this.stopVoiceImmediately(voice);
             this.activeVoices.delete(voice.note);
             (`🔇 Voice ${voice.id} fully stopped after release envelope`);
-        }, releaseTime * 1000 + 10); // Small buffer to ensure envelope completes
+        }, releaseTime * 1000 + 50); // 50ms buffer to ensure envelope completes
     }
     
     stopVoiceImmediately(voice) {
